@@ -1,21 +1,34 @@
+import kotlin.math.abs
+
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    fun parseInput(input: List<String>): Pair<List<Int>, List<Int>> {
+        val regex = "\\s+".toRegex()
+        val locationPairs = input.map {
+            val parts = it.trim().split(regex)
+            if (parts.size >= 2) {
+                parts[0].toInt() to parts[1].toInt()
+            } else {
+                throw IllegalArgumentException()
+            }
+        }
+        mutableListOf<Int>()
+        return locationPairs.fold(mutableListOf<Int>() to mutableListOf<Int>()) { acc, pair ->
+            acc.first.add(pair.first)
+            acc.second.add(pair.second)
+            acc
+        }
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
+    // Part 1
+    fun calcDistanceScore(leftLocations: List<Int>, rightLocations: List<Int>): Int =
+        leftLocations.sorted().zip(rightLocations.sorted()).sumOf { abs(it.first - it.second) }
 
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
+    // Part 2
+    fun calcSimilarityScore(leftLocations: List<Int>, rightLocations: List<Int>): Int =
+        leftLocations.sumOf { leftLocation -> leftLocation * rightLocations.filter { it == leftLocation }.size }
 
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    // Read the input from the `src/Day01.txt` file.
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    val testInput = readInput("Day01")
+    val (leftLocations, rightLocations) = parseInput(testInput)
+    calcDistanceScore(leftLocations, rightLocations).println()
+    calcSimilarityScore(leftLocations, rightLocations).println()
 }
